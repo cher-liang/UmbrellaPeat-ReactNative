@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, FC } from 'react';
 import {
   Alert,
   Linking,
@@ -9,7 +9,8 @@ import {
   View,
 } from 'react-native';
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
-import {MapMarkerProps } from 'react-native-maps';
+import { LatLng, MapMarkerProps } from 'react-native-maps';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MapView from '../components/MapView';
@@ -18,8 +19,13 @@ import appConfig from '../../app.json';
 import get3Words from '../services/What3Words';
 import hasMessage from '../utils/CatchErrorMessage';
 
-const HomeScreen = () => {
-// export default function HomeScreen() {
+import type { HomeNavigationProps, HomeRouteProps } from '../types/screens';
+
+const HomeScreen: FC = () => {
+  // export default function HomeScreen({ route, navigation }: HomeNavigationProps) {
+  const navigation = useNavigation<HomeNavigationProps>();
+  const route = useRoute<HomeRouteProps>();
+
   const [location, setLocation] = useState<GeoPosition | null>(null);
   const [markers, setMarkers] = useState<MapMarkerProps[]>([]);
   const [count, setCount] = useState(0); // temporary
@@ -30,6 +36,36 @@ const HomeScreen = () => {
     loadMarkers();
     getLocationUpdates();
   }, []);
+
+  const returnMarker = route.params;
+
+  useEffect(() => {
+    if (returnMarker) {
+      const marker = {
+        title: returnMarker.device_id,
+        description: returnMarker.what3words,
+        coordinate: { latitude: returnMarker.latitude, longitude: returnMarker.longitude } as LatLng
+      };
+      setMarkers(markers.concat(
+        marker as MapMarkerProps))
+
+      const saveToStorage = async () => {
+        try {
+          await AsyncStorage.setItem(returnMarker.device_id, JSON.stringify(marker));
+        } catch (e) {
+          if (hasMessage(e)) {
+            console.error('Caught error: ' + (e.message || e));
+          } else {
+            console.error('Unknown error: ' + e);
+          }
+        };
+      }
+
+      saveToStorage();
+
+    }
+
+  }, [returnMarker])
 
   const hasPermissionIOS = async () => {
     const openSetting = () => {
@@ -117,7 +153,7 @@ const HomeScreen = () => {
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
         setLocation(null);
-        console.log(error);
+        console.error(error);
       },
       {
         accuracy: {
@@ -168,25 +204,33 @@ const HomeScreen = () => {
 
   const addMarker = async () => {
     await getLocation();
-    const threeWords = await get3Words(location?.coords.latitude!, location?.coords.longitude!);
-    const marker = {
-      title: 'test', // Placeholder
-      description: threeWords,
-      coordinate: location?.coords
-    };
-    setMarkers(markers.concat(
-      marker as MapMarkerProps))
+    if (location?.coords) {
+      navigation.navigate('MarkerDetails',
+        {
+          latitude: location?.coords.latitude!,
+          longitude: location?.coords.longitude!
+        })
+    }
 
-    setCount(count + 1);
-    try {
-      await AsyncStorage.setItem(count.toString(), JSON.stringify(marker));
-    } catch (e) {
-      if (hasMessage(e)) {
-        console.error('Caught error: ' + (e.message || e));
-      } else {
-        console.error('Unknown error: ' + e);
-      }
-    };
+    // const threeWords = await get3Words(location?.coords.latitude!, location?.coords.longitude!);
+    // const marker = {
+    //   title: 'test', // Placeholder
+    //   description: threeWords,
+    //   coordinate: location?.coords
+    // };
+    // setMarkers(markers.concat(
+    //   marker as MapMarkerProps))
+
+    // setCount(count + 1);
+    // try {
+    //   await AsyncStorage.setItem(count.toString(), JSON.stringify(marker));
+    // } catch (e) {
+    //   if (hasMessage(e)) {
+    //     console.error('Caught error: ' + (e.message || e));
+    //   } else {
+    //     console.error('Unknown error: ' + e);
+    //   }
+    // };
   };
 
   const loadMarkers = async () => {

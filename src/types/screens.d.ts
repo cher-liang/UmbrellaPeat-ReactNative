@@ -1,12 +1,25 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+import type { StackScreenProps } from '@react-navigation/native-stack';
+
+// export type ReturnMarkerDetailsProps = {
+
+// };
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home: {
+    device_id: string;
+    latitude: number;
+    longitude: number;
+    what3words: string;
+  };
   MarkerDetails: {
     latitude: number,
-    longtitude: number
+    longitude: number
   };
 };
 
-export type HomeNavigationProps = NativeStackScreenProps<RootStackParamList>;
-export type MarkerDetailsNavigationProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+export type HomeNavigationProps = StackScreenProps<RootStackParamList>;
+export type MarkerDetailsNavigationProps = StackScreenProps<RootStackParamList, 'MarkerDetails'>;
+
+export type HomeRouteProps = RouteProp<RootStackParamList, 'Home'>;
+export type MarkerDetailsRouteProps = RouteProp<RootStackParamList, 'MarkerDetails'>;
