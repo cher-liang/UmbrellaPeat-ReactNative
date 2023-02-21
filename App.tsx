@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import HomeScreen from './src/screens/HomeScreen'
+import PeatMap_Home from './src/screens/PeatMap_Home'
 import MarkerDetails from './src/screens/MarkerDetails';
 
 import type { RootStackParamList } from './src/types/screens';
@@ -26,7 +26,7 @@ export default function App() {
           // })
         }}>
         <RootStack.Group>
-          <RootStack.Screen name="Home" component={HomeScreen} />
+          <RootStack.Screen name="Home" component={PeatMap_Home} />
         </RootStack.Group>
         <RootStack.Group screenOptions={{ presentation: 'modal'}}>
           <RootStack.Screen name="MarkerDetails" component={MarkerDetails} />

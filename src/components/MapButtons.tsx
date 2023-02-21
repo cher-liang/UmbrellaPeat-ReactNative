@@ -2,12 +2,13 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, Image, ImageSourcePropType } from 'react-native';
 
 interface MapButtonProps {
-    onPress: () => void;
+    onPressIn: () => void;
+    onPressOut?: () => void;
     source: ImageSourcePropType;
 }
 
-const MapButtons: React.FC<MapButtonProps> = ({ onPress, source }) => (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+const MapButtons: React.FC<MapButtonProps> = ({ onPressIn, onPressOut, source }) => (
+    <TouchableOpacity style={styles.button} onPressIn={onPressIn} onPressOut={onPressOut}>
         <Image source={source} style={styles.image} />
     </TouchableOpacity>
 );
