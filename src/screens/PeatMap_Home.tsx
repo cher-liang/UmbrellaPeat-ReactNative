@@ -26,15 +26,20 @@ const PeatMap_Home: FC = () => {
   const navigation = useNavigation<HomeNavigationProps>();
   const route = useRoute<HomeRouteProps>();
 
-  const [location, setLocation] = useState<GeoPosition | null>(null);
+  // const location = useRef<GeoPosition | null>(null);
+  // const [location, setLocation] = useState<GeoPosition | null>(null);
   const [markers, setMarkers] = useState<MapMarkerProps[]>([]);
   const [animateCameraTo, setAnimateCameraTo] = useState<LatLng | null>(null);
 
   useEffect(() => {
-    async () => {
-      console.log("here... requesting location permission");
+    // AsyncStorage.clear();
+    const f = async () => {
       await hasLocationPermission();
+      await animateCameraToCurrentPosition();
+      await resetAnimateCameraTo();
     }
+    f();
+
     loadMarkers();
     // getLocationUpdates();
   }, []);
@@ -69,34 +74,36 @@ const PeatMap_Home: FC = () => {
 
   }, [returnMarker])
 
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission();
+  const getLocation = () => {
+    // const hasPermission = await hasLocationPermission();
 
-    if (!hasPermission) {
-      return;
-    }
+    // if (!hasPermission) {
+    //   return;
+    // }
 
-    Geolocation.getCurrentPosition(
-      position => {
-        setLocation(position);
-        // console.log(position);
-      },
-      error => {
-        Alert.alert(`Code ${error.code}`, error.message);
-        setLocation(null);
-        console.error(error);
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
+    return new Promise<GeoPosition>((resolve, reject) => {
+      Geolocation.getCurrentPosition(
+        position => {
+          resolve(position);
         },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-      },
-    );
+        error => {
+          Alert.alert(`Code ${error.code}`, error.message);
+          console.error(error);
+          reject(null);
+        },
+        {
+          accuracy: {
+            android: 'high',
+            ios: 'best',
+          },
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+          distanceFilter: 0,
+        },
+      );
+    })
+
 
   };
 
@@ -136,14 +143,17 @@ const PeatMap_Home: FC = () => {
   // };
 
   const addMarker = async () => {
-    await getLocation();
-    if (location?.coords) {
+    const location = await getLocation();
+
+    if (location) {
       navigation.navigate('MarkerDetails',
         {
-          latitude: location?.coords.latitude!,
-          longitude: location?.coords.longitude!
+          latitude: location.coords.latitude!,
+          longitude: location.coords.longitude!
         })
     }
+
+    await resetAnimateCameraTo();
   };
 
   const loadMarkers = async () => {
@@ -173,16 +183,18 @@ const PeatMap_Home: FC = () => {
   }
 
   const animateCameraToCurrentPosition = async () => {
-    await getLocation();
+    const location = await getLocation();
 
-    setAnimateCameraTo(
-      {
-        latitude: location?.coords.latitude,
-        longitude: location?.coords.longitude
-      } as LatLng);
+    if (location) {
+      setAnimateCameraTo(
+        {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+        } as LatLng);
+    }
   }
 
-  const resetAnimateCameraTo =async () => {
+  const resetAnimateCameraTo = async () => {
     await new Promise(f => setTimeout(f, 3000)); // delay 3 seconds
 
     setAnimateCameraTo(null)
@@ -191,7 +203,7 @@ const PeatMap_Home: FC = () => {
   return (
     <View style={styles.mainContainer}>
       <MapView
-        coords={location?.coords || null}
+        // coords={location?.coords || null}
         markers={markers}
         customMapStyle={customMapStyle}
         animateCameraTo={animateCameraTo || null} />

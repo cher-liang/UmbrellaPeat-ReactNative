@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GeoCoordinates } from 'react-native-geolocation-service';
-import MapView, { Circle, Marker, MapMarkerProps, PROVIDER_GOOGLE, MapStyleElement, LatLng } from 'react-native-maps';
+import MapView, { Circle, Marker, MapMarkerProps, PROVIDER_GOOGLE, MapStyleElement, LatLng, LongPressEvent } from 'react-native-maps';
 
 interface MapViewProps {
-  coords: GeoCoordinates | null;
+  // coords: GeoCoordinates | null;
   markers: MapMarkerProps[] | null;
   customMapStyle: MapStyleElement[];
   animateCameraTo: LatLng | null;
 }
 
-const PeatMapView = ({ coords, markers, customMapStyle, animateCameraTo }: MapViewProps) => {
+const PeatMapView = ({markers, customMapStyle, animateCameraTo }: MapViewProps) => {
   const mapRef = useRef<MapView>(null);
 
   if (!!animateCameraTo && mapRef.current) {
@@ -25,6 +25,10 @@ const PeatMapView = ({ coords, markers, customMapStyle, animateCameraTo }: MapVi
       zoom: 17,
     });
   }
+
+  // function testlongpress(event:LongPressEvent){
+  //   console.log(event.nativeEvent.coordinate);
+  // }
 
   return (
     <View style={styles.container}>
@@ -48,6 +52,7 @@ const PeatMapView = ({ coords, markers, customMapStyle, animateCameraTo }: MapVi
         showsCompass={false}
         showsMyLocationButton={false}
         customMapStyle={customMapStyle}
+        // onLongPress={testlongpress}
       >
         {!!markers && (
           markers.map((marker, index) =>
