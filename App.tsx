@@ -9,6 +9,8 @@ import {
 import MD3OrangeLight from './src/assets/themes/OrangeLightTheme.json'
 import MD3BlueDark from './src/assets/themes/BlueDarkTheme.json'
 
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+
 import App from './src/RootNavigator'
 
 function getTheme() {
@@ -21,7 +23,7 @@ function getTheme() {
     return {
       ...DarkTheme,
       colors: MD3BlueDark
-    } 
+    }
   }
 }
 
@@ -32,7 +34,11 @@ const theme = {
 
 export default function UmbrellaPeat() {
   return (
-    <PaperProvider theme={getTheme()}>
+    <PaperProvider
+      settings={{
+        icon: props => <MaterialIcons {...props} />,
+      }}
+      theme={getTheme()}>
       <App />
     </PaperProvider>
   )

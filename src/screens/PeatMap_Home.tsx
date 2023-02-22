@@ -6,12 +6,13 @@ import {
   View,
 } from 'react-native';
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
-import { LatLng, MapMarkerProps, PROVIDER_GOOGLE } from 'react-native-maps';
+import { LatLng, MapMarkerProps } from 'react-native-maps';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MapView from '../components/MapView2';
-import MapButtons from '../components/MapButtons';
+import AddMarkerButton from '../components/AddMarkerButton';
+import MyLocationButton from '../components/MyLocationButton';
 import hasMessage from '../utils/CatchErrorMessage';
 import hasLocationPermission from '../utils/RequestLocationPermission';
 
@@ -208,19 +209,12 @@ const PeatMap_Home: FC = () => {
         customMapStyle={customMapStyle}
         animateCameraTo={animateCameraTo || null} />
       <View style={styles.bottom}>
-        <MapButtons
+        <MyLocationButton
           onPressIn={animateCameraToCurrentPosition}
-          onPressOut={resetAnimateCameraTo}
-          source={require('../assets/icons/current-location-icon.png')} />
-        <MapButtons
-          onPressIn={addMarker}
-          source={require('../assets/icons/sign-plus-outline-icon.png')} />
+          onPressOut={resetAnimateCameraTo} />
+        <AddMarkerButton
+          onPress={addMarker} />
       </View>
-      {/* <>
-      {
-        console.log(location?.coords!)
-      }
-      </> */}
     </View>
   );
 }
@@ -239,7 +233,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 15
-  }
+  },
 });
 
 export default PeatMap_Home;
