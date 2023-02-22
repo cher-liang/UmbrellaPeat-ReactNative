@@ -21,8 +21,8 @@ import type { HomeNavigationProps, HomeRouteProps } from '../types/screens';
 const PeatMap_Home: FC = () => {
   const colorScheme = Appearance.getColorScheme();
   const customMapStyle = (colorScheme == 'dark') ?
-    require('../components/mapDarkModeStyle.json') :
-    require('../components/mapLightModeStyle.json');
+    require('../assets/styles/mapDarkModeStyle.json') :
+    require('../assets/styles/mapLightModeStyle.json');
 
   const navigation = useNavigation<HomeNavigationProps>();
   const route = useRoute<HomeRouteProps>();
