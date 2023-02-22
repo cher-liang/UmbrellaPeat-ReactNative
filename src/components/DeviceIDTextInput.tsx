@@ -69,6 +69,7 @@ const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,trig
                 theme={{
                     roundness:25
                 }}
+                style={styles.textInput}
             />
             <HelperText type="error" visible={errorBool}>
                 Device ID must be unique
@@ -81,6 +82,9 @@ const styles = StyleSheet.create({
     inputContainerStyle: {
         flex:1,
         marginHorizontal: 10,
+    },
+    textInput:{
+        fontSize:22
     }
 });
 
