@@ -16,9 +16,12 @@ import get3Words from '../services/What3Words';
 import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
 import ScreenWrapper from '../ScreenWrapper';
 
-import hasMessage from '../utils/CatchErrorMessage';
+// import hasMessage from '../utils/CatchErrorMessage';
 
 import DeviceIDTextInput from '../components/DeviceIDTextInput';
+import LocationCard from '../components/LocationCard';
+import { Button, useTheme } from 'react-native-paper';
+import MarkerImagesCard from '../components/MarkerImagesCard';
 
 type AvoidingViewProps = {
     children: React.ReactNode;
@@ -39,55 +42,46 @@ const TextInputAvoidingView = ({ children }: AvoidingViewProps) => {
 };
 
 const MarkerDetails: FC = () => {
+    const theme = useTheme();
+
     const navigation = useNavigation<MarkerDetailsNavigationProps>();
     const route = useRoute<MarkerDetailsRouteProps>();
 
     const [deviceId, setDeviceId] = useState<string>();
     const [triggerDeviceIDError, setTriggerDeviceIDError] = useState<boolean>(false);
     const [latitude, setLatitude] = useState(route.params.latitude.toFixed(5).toString());
-    const [longitude, setLongtitude] = useState(route.params.longitude.toFixed(5).toString());
+    const [longitude, setLongitude] = useState(route.params.longitude.toFixed(5).toString());
     const [what3words, setWhat3Words] = useState<string>();
 
-    // const [existingDeviceIDs, setExistingDeviceIDs] = useState<readonly string[]>();
 
-    // on startup, fetch all existing device IDs
-    // useEffect(() => {
-    //     const fetchExistingDeviceIDs = async () => {
-    //         try {
-    //             setExistingDeviceIDs(await AsyncStorage.getAllKeys());
-    //         } catch (e) {
-    //             if (hasMessage(e)) {
-    //                 console.error('Caught error: ' + (e.message || e));
-    //             } else {
-    //                 console.error('Unknown error: ' + e);
-    //             }
-    //         };
-    //     }
-    //     fetchExistingDeviceIDs();
-    // }, []); 
+    const saveButtonPressed = async () => {
+        if (deviceId) {
+            navigation.navigate('Home',
+                {
+                    device_id: deviceId!,
+                    latitude: Number(latitude!),
+                    longitude: Number(longitude!),
+                    what3words: what3words!,
+                })
+        }else{
+            setTriggerDeviceIDError(true);
+        }
+    };
 
-    useEffect(() => {
+    function onLatLngChange(latitude: string, longitude: string) {
+        setLatitude(latitude);
+        setLongitude(longitude);
         const fetchWhat3Words = async () => {
             setWhat3Words(await get3Words(Number(latitude!), Number(longitude!)));
         }
         fetchWhat3Words()
             .catch(console.error);
-    }, [latitude, longitude]);
-
-    const saveButtonPressed = async () => {
-        navigation.navigate('Home',
-            {
-                device_id: deviceId!,
-                latitude: Number(latitude!),
-                longitude: Number(longitude!),
-                what3words: what3words!,
-            })
-    };
+    }
 
     return (
         <TextInputAvoidingView>
             <ScreenWrapper
-                keyboardShouldPersistTaps={'always'}
+                keyboardShouldPersistTaps={'never'}
                 removeClippedSubviews={false}
             >
                 <View style={styles.mainContainer}>
@@ -95,69 +89,53 @@ const MarkerDetails: FC = () => {
                         onChangeText={setDeviceId}
                         triggerError={triggerDeviceIDError}
                     />
+                    <LocationCard
+                        latitude={latitude}
+                        longitude={longitude}
+                        what3words={what3words}
+                        onLatLngChange={onLatLngChange}
+                    />
+                    <MarkerImagesCard />
+                    {/* <LocationCard
+                        latitude={latitude}
+                        longitude={longitude}
+                        what3words={what3words}
+                        onLatLngChange={onLatLngChange}
+                    /> */}
+
+                </View>
+                <View style={styles.footer}>
+
+                    <View style={styles.fiftyPercentContainer}>
+                        <View style={styles.fiftyPercent}>
+                            <Button
+                                icon="content-save-outline"
+                                mode="elevated"
+                                onPress={saveButtonPressed}
+                                style={styles.button}
+                                labelStyle={styles.fontStyle}
+                            >
+                                Save
+                            </Button>
+                        </View>
+                        <View style={styles.fiftyPercent}>
+                            <Button
+                                icon="close-box-outline"
+                                mode="elevated"
+                                buttonColor={theme.colors.inversePrimary}
+                                onPress={() => {navigation.goBack()}}
+                                style={styles.button}
+                                labelStyle={styles.fontStyle}
+                            >
+                                Cancel
+                            </Button>
+                        </View>
+                    </View>
                 </View>
 
             </ScreenWrapper>
         </TextInputAvoidingView>
     );
-    // return (
-    //     <View style={styles.mainContainer}>
-    //         <View style={styles.childrenContainer}>
-    //             <Text style={styles.text}>Device ID:</Text>
-    //             <TextInput
-    //                 style={styles.textInput}
-    //                 value={deviceId}
-    //                 onChangeText={setDeviceId}
-    //                 autoCorrect={false} />
-    //         </View>
-    //         <View style={styles.coordinatesContainer}>
-    //             <View style={styles.fiftyPercentContainer}>
-    //                 <Text style={styles.text}>Latitude:</Text>
-    //                 <TextInput
-    //                     style={styles.textInput}
-    //                     value={latitude}
-    //                     onChangeText={setLatitude}
-    //                     placeholder={latitude}
-    //                     keyboardType="numeric" />
-    //             </View>
-    //             <View style={styles.fiftyPercentContainer}>
-    //                 <Text style={styles.text}>Longtitude:</Text>
-    //                 <TextInput
-    //                     style={styles.textInput}
-    //                     value={longitude}
-    //                     onChangeText={setLongtitude}
-    //                     placeholder={longitude}
-    //                     keyboardType="numeric" />
-    //             </View>
-    //         </View>
-    //         <View style={styles.childrenContainer}>
-    //             <Text style={styles.text}>What3Words:</Text>
-    //             <Text
-    //                 adjustsFontSizeToFit
-    //                 numberOfLines={1}
-    //                 style={styles.what3wordstText}>
-    //                 <Text style={{ color: 'red' }}>///</Text>
-    //                 {what3words}
-    //             </Text>
-    //         </View>
-    //         <View style={styles.coordinatesContainer}>
-    //             <View style={styles.fiftyPercentContainer}>
-    //                 <TouchableOpacity
-    //                     style={styles.saveButton}
-    //                     onPress={saveButtonPressed}>
-    //                     <Text style={styles.ButtonText}>Save</Text>
-    //                 </TouchableOpacity>
-    //             </View>
-    //             <View style={styles.fiftyPercentContainer}>
-    //                 <TouchableOpacity
-    //                     style={styles.cancelButton}
-    //                     onPress={() => { navigation.goBack() }}>
-    //                     <Text style={styles.ButtonText}>Cancel</Text>
-    //                 </TouchableOpacity>
-    //             </View>
-    //         </View>
-    //     </View>
-    // );
 };
 
 const styles = StyleSheet.create({
@@ -166,70 +144,38 @@ const styles = StyleSheet.create({
     },
     mainContainer: {
         flex: 1,
-        marginVertical: 30,
-        marginHorizontal: 20,
+        marginVertical: 20,
+        marginHorizontal: 10,
+        flexDirection: 'column',
+        justifyContent: 'space-evenly'
+    },
+    footer: {
+        flex: 1,
+        marginBottom: 20,
+        justifyContent: 'flex-end',
+    },
+    fiftyPercentContainer: {
+        flex: 1,
+        margin: 10,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-evenly',
+        alignItems: 'stretch',
+    },
+    fiftyPercent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        marginHorizontal: 10,
+    },
+    button: {
+        flex: 1,
+    },
+    fontStyle: {
+        fontSize: 22,
+        lineHeight: 30,
+        margin: 5
     }
-    // mainContainer: {
-    //     flex: 1,
-    //     justifyContent: 'space-evenly',
-    //     marginVertical: 20,
-    //     marginHorizontal: 20,
-    //     backgroundColor: '#faf9f6',
-    // },
-    // childrenContainer: {
-    //     flex: 1,
-    //     margin: 10
-    // },
-    // coordinatesContainer: {
-    //     flex: 1,
-    //     flexDirection: 'row',
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    // },
-    // fiftyPercentContainer: {
-    //     width: '45%',
-    //     margin: 10,
-    // },
-    // textInput: {
-    //     color: '#4f4f4f',
-    //     height: 70,
-    //     fontSize: 30,
-    //     borderWidth: 1,
-    //     borderColor: "#dadde1",
-    //     padding: 10,
-    // },
-    // text: {
-    //     fontSize: 20,
-    //     fontFamily: 'Roboto-Bold',
-    //     color: '#252526',
-    //     marginBottom: 5,
-    // },
-    // what3wordstText: {
-    //     color: '#4f4f4f',
-    //     height: 50,
-    //     borderWidth: 1,
-    //     borderColor: "#dadde1",
-    //     padding: 10,
-    //     fontSize: 20,
-    // },
-    // saveButton: {
-    //     flex: 1,
-    //     backgroundColor: '#757cf0',
-    //     borderRadius: 8,
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    // },
-    // cancelButton: {
-    //     flex: 1,
-    //     backgroundColor: '#f2837c',
-    //     borderRadius: 8,
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    // },
-    // ButtonText: {
-    //     color: 'white',
-    //     fontSize: 30,
-    // }
 });
 
 export default MarkerDetails;
