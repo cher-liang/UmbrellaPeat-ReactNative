@@ -11,7 +11,7 @@ interface DeviceIDTextInputProps {
     triggerError: boolean;
 }
 
-const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,triggerError: triggleError }) => {
+const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,triggerError }) => {
     const theme= useTheme();
 
     // const [deviceId,setDeviceId]= useState("");
@@ -36,8 +36,8 @@ const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,trig
     }, []);
 
     useEffect(()=>{
-        setErrorBool(triggleError)
-    },[triggleError])
+        setErrorBool(triggerError)
+    },[triggerError])
 
     function validateDeviceID(deviceId: string) {
         if (existingDeviceIDs.includes(deviceId)) {
@@ -59,7 +59,7 @@ const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,trig
     return (
         <View style={styles.inputContainerStyle}>
             <TextInput
-                label="Device ID:"
+                label="Device ID"
                 placeholder="Enter unique device id"
                 onChangeText={validateDeviceID}
                 right={renderXIcon()}
@@ -79,7 +79,8 @@ const DeviceIDTextInput: React.FC<DeviceIDTextInputProps> = ({ onChangeText,trig
 
 const styles = StyleSheet.create({
     inputContainerStyle: {
-        margin: 10
+        flex:1,
+        marginHorizontal: 10,
     }
 });
 
