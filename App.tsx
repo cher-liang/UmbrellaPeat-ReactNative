@@ -1,38 +1,40 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Appearance } from 'react-native'
+import {
+  Provider as PaperProvider,
+  MD3LightTheme as LightTheme,
+  MD3DarkTheme as DarkTheme,
+} from 'react-native-paper';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import MD3OrangeLight from './src/assets/themes/OrangeLightTheme.json'
+import MD3BlueDark from './src/assets/themes/BlueDarkTheme.json'
 
-import PeatMap_Home from './src/screens/PeatMap_Home'
-import MarkerDetails from './src/screens/MarkerDetails';
+import App from './src/RootNavigator'
 
-import type { RootStackParamList } from './src/types/screens';
+function getTheme() {
+  if (Appearance.getColorScheme() == 'light') {
+    return {
+      ...LightTheme,
+      colors: MD3OrangeLight
+    }
+  } else {
+    return {
+      ...DarkTheme,
+      colors: MD3BlueDark
+    } 
+  }
+}
 
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+const theme = {
+  ...LightTheme,
+  colors: MD3OrangeLight
+};
 
-export default function App() {
-
+export default function UmbrellaPeat() {
   return (
-    <NavigationContainer>
-      <RootStack.Navigator
-        screenOptions={{
-          headerShown: false,
-          // gestureEnabled: true,
-          // ...Platform.select({
-          //   android: {
-          //     ...TransitionPresets.ModalPresentationIOS,
-          //   }
-          // })
-        }}>
-        <RootStack.Group>
-          <RootStack.Screen name="Home" component={PeatMap_Home} />
-        </RootStack.Group>
-        <RootStack.Group screenOptions={{ presentation: 'modal'}}>
-          <RootStack.Screen name="MarkerDetails" component={MarkerDetails} />
-        </RootStack.Group>
-      </RootStack.Navigator>
-    </NavigationContainer>
-  );
+    <PaperProvider theme={getTheme()}>
+      <App />
+    </PaperProvider>
+  )
 }
 
