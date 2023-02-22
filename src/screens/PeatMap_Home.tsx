@@ -60,7 +60,22 @@ const PeatMap_Home: FC = () => {
 
       const saveToStorage = async () => {
         try {
-          await AsyncStorage.setItem(returnMarker.device_id, JSON.stringify(marker));
+          const jsonValue = await AsyncStorage.getItem(returnMarker.device_id)
+          // check if device existed in the database before (if yes, update edit timestamp)
+          if (jsonValue) { 
+            await AsyncStorage.setItem(
+              returnMarker.device_id,
+              JSON.stringify({
+                edited_timestamp: Date.now(),
+                timestamp: JSON.parse(jsonValue)['timestamp'],
+                ...returnMarker
+              })
+            )
+          } else {
+            await AsyncStorage.setItem(
+              returnMarker.device_id,
+              JSON.stringify({ timestamp: Date.now(), ...returnMarker }));
+          }
         } catch (e) {
           if (hasMessage(e)) {
             console.error('Caught error: ' + (e.message || e));
@@ -201,13 +216,24 @@ const PeatMap_Home: FC = () => {
     setAnimateCameraTo(null)
   }
 
+  const onMarkerCalloutPress = async (markerId: string) => {
+    const marker = await AsyncStorage.getItem(markerId);
+    console.log(marker);
+
+  }
+  // function onMarkerCalloutPress(markerId:string) {
+  //   AsyncStorage.getItem()
+  // }
+
   return (
     <View style={styles.mainContainer}>
       <MapView
         // coords={location?.coords || null}
         markers={markers}
         customMapStyle={customMapStyle}
-        animateCameraTo={animateCameraTo || null} />
+        animateCameraTo={animateCameraTo}
+        onMarkerCalloutPress={onMarkerCalloutPress}
+      />
       <View style={styles.bottom}>
         <MyLocationButton
           onPressIn={animateCameraToCurrentPosition}
