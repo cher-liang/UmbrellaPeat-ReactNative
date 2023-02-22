@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 interface MapButtonProps {
     onPressIn: () => void;
@@ -17,7 +17,7 @@ const MyLocationButton: React.FC<MapButtonProps> = ({ onPressIn, onPressOut }) =
             onPressIn={onPressIn}
             onPressOut={onPressOut}
         >
-            <MaterialIcons name="my-location" color={theme.colors.onSecondaryContainer} size={38}/>
+            <Icons name="crosshairs-gps" color={theme.colors.onSecondaryContainer} size={38}/>
         </TouchableOpacity>
     )
 
