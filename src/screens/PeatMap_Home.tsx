@@ -13,6 +13,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView from '../components/MapView2';
 import AddMarkerButton from '../components/AddMarkerButton';
 import MyLocationButton from '../components/MyLocationButton';
+import MarkerCalloutModal from '../components/MarkerCalloutModal';
+
 import hasMessage from '../utils/CatchErrorMessage';
 import hasLocationPermission from '../utils/RequestLocationPermission';
 
@@ -31,6 +33,10 @@ const PeatMap_Home: FC = () => {
   // const [location, setLocation] = useState<GeoPosition | null>(null);
   const [markers, setMarkers] = useState<MapMarkerProps[]>([]);
   const [animateCameraTo, setAnimateCameraTo] = useState<LatLng | null>(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMarkerId, setModalMarkerId] = useState('');
+
 
   useEffect(() => {
     // AsyncStorage.clear();
@@ -51,7 +57,7 @@ const PeatMap_Home: FC = () => {
   useEffect(() => {
     if (returnMarker) {
       const marker = {
-        title: returnMarker.device_id,
+        title: returnMarker.deviceId,
         description: returnMarker.what3words,
         coordinate: { latitude: returnMarker.latitude, longitude: returnMarker.longitude } as LatLng
       };
@@ -60,11 +66,11 @@ const PeatMap_Home: FC = () => {
 
       const saveToStorage = async () => {
         try {
-          const jsonValue = await AsyncStorage.getItem(returnMarker.device_id)
+          const jsonValue = await AsyncStorage.getItem(returnMarker.deviceId)
           // check if device existed in the database before (if yes, update edit timestamp)
-          if (jsonValue) { 
+          if (jsonValue) {
             await AsyncStorage.setItem(
-              returnMarker.device_id,
+              returnMarker.deviceId,
               JSON.stringify({
                 edited_timestamp: Date.now(),
                 timestamp: JSON.parse(jsonValue)['timestamp'],
@@ -73,7 +79,7 @@ const PeatMap_Home: FC = () => {
             )
           } else {
             await AsyncStorage.setItem(
-              returnMarker.device_id,
+              returnMarker.deviceId,
               JSON.stringify({ timestamp: Date.now(), ...returnMarker }));
           }
         } catch (e) {
@@ -181,11 +187,11 @@ const PeatMap_Home: FC = () => {
       const temp_markers: MapMarkerProps[] = [];
       values.map((value) => {
         const data = JSON.parse(value[1]!);
-
+        
         temp_markers.push({
-          title: data.title,
-          description: data.description,
-          coordinate: data.coordinate
+          title: data['deviceId'],
+          description: data['what3words'],
+          coordinate: {latitude:data['latitude'],longitude:data['longitude']}
         })
       });
       setMarkers(temp_markers);
@@ -216,10 +222,11 @@ const PeatMap_Home: FC = () => {
     setAnimateCameraTo(null)
   }
 
-  const onMarkerCalloutPress = async (markerId: string) => {
-    const marker = await AsyncStorage.getItem(markerId);
-    console.log(marker);
 
+  const onMarkerCalloutPress = async (markerId: string) => {
+    setModalMarkerId(markerId);
+    setModalVisible(true);
+    // const marker = await AsyncStorage.getItem(markerId);
   }
   // function onMarkerCalloutPress(markerId:string) {
   //   AsyncStorage.getItem()
@@ -227,6 +234,14 @@ const PeatMap_Home: FC = () => {
 
   return (
     <View style={styles.mainContainer}>
+      {/* {
+        modalVisible &&
+        <MarkerCalloutModal
+          visible={true}
+          markerId={modalMarkerId}
+          onDismiss={() => { setModalVisible(false) }}
+        />
+      } */}
       <MapView
         // coords={location?.coords || null}
         markers={markers}
