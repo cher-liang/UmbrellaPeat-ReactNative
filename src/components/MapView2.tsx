@@ -1,16 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GeoCoordinates } from 'react-native-geolocation-service';
-import MapView, { Circle, Marker, MapMarkerProps, PROVIDER_GOOGLE, MapStyleElement, LatLng, LongPressEvent } from 'react-native-maps';
+import MapView, { Circle, Marker, MapMarkerProps, PROVIDER_GOOGLE, MapStyleElement, LatLng, LongPressEvent, CalloutPressEvent } from 'react-native-maps';
 
 interface MapViewProps {
   // coords: GeoCoordinates | null;
   markers: MapMarkerProps[] | null;
   customMapStyle: MapStyleElement[];
   animateCameraTo: LatLng | null;
+  onMarkerCalloutPress: (markerId: string) => void;
 }
 
-const PeatMapView = ({markers, customMapStyle, animateCameraTo }: MapViewProps) => {
+const PeatMapView = ({
+  markers,
+  customMapStyle,
+  animateCameraTo,
+  onMarkerCalloutPress
+}: MapViewProps) => {
+
   const mapRef = useRef<MapView>(null);
 
   if (!!animateCameraTo && mapRef.current) {
@@ -29,6 +36,10 @@ const PeatMapView = ({markers, customMapStyle, animateCameraTo }: MapViewProps) 
   // function testlongpress(event:LongPressEvent){
   //   console.log(event.nativeEvent.coordinate);
   // }
+
+  function onCalloutPress(markerId: string) {
+    onMarkerCalloutPress(markerId);
+  }
 
   return (
     <View style={styles.container}>
@@ -52,16 +63,18 @@ const PeatMapView = ({markers, customMapStyle, animateCameraTo }: MapViewProps) 
         showsCompass={false}
         showsMyLocationButton={false}
         customMapStyle={customMapStyle}
-        // onLongPress={testlongpress}
+      // onLongPress={testlongpress}
       >
         {!!markers && (
           markers.map((marker, index) =>
             <Marker
-              key={index}
+              key={marker.title}
               coordinate={marker.coordinate}
               title={marker.title}
               description={marker.description}
               tracksViewChanges={false}
+              // onPress={(event)=>{console.log(event.nativeEvent)}}
+              onCalloutPress={() => { onCalloutPress(marker.title!) }}
             />)
         )}
       </MapView>
