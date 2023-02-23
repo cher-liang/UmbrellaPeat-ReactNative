@@ -1,27 +1,24 @@
-import { useEffect, useState, FC } from 'react';
+import { useState, FC, useMemo, useRef } from 'react';
 import {
     StyleSheet,
     View,
-    TextInput,
-    Text,
-    TouchableOpacity,
     Platform,
     KeyboardAvoidingView
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import get3Words from '../services/What3Words';
 
 import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
 import ScreenWrapper from '../ScreenWrapper';
 
-// import hasMessage from '../utils/CatchErrorMessage';
-
 import DeviceIDTextInput from '../components/DeviceIDTextInput';
 import LocationCard from '../components/LocationCard';
 import { Button, useTheme } from 'react-native-paper';
 import MarkerImagesCard from '../components/MarkerImagesCard';
+
+import hasMessage from '../utils/CatchErrorMessage';
 
 type AvoidingViewProps = {
     children: React.ReactNode;
@@ -47,28 +44,45 @@ const MarkerDetails: FC = () => {
     const navigation = useNavigation<MarkerDetailsNavigationProps>();
     const route = useRoute<MarkerDetailsRouteProps>();
 
-    const [deviceId, setDeviceId] = useState<string>();
-    const [triggerDeviceIDError, setTriggerDeviceIDError] = useState<boolean>(false);
+    const deviceId = useRef('');
     const [latitude, setLatitude] = useState(route.params.latitude.toFixed(5).toString());
     const [longitude, setLongitude] = useState(route.params.longitude.toFixed(5).toString());
     const [what3words, setWhat3Words] = useState<string>();
 
+    const [existingDeviceIDs, setExistingDeviceIDs] = useState<readonly string[]>([]);
+    const [deviceIdError, setDeviceIdError] = useState<'must unique' | 'empty' | ''>('');
 
-    const saveButtonPressed = async () => {
-        if (deviceId) {
+
+    useMemo(() => {
+        const fetchExistingDeviceIDs = async () => {
+            try {
+                setExistingDeviceIDs(await AsyncStorage.getAllKeys());
+            } catch (e) {
+                if (hasMessage(e)) {
+                    console.error('Caught error: ' + (e.message || e));
+                } else {
+                    console.error('Unknown error: ' + e);
+                }
+            };
+        }
+        fetchExistingDeviceIDs();
+    }, []);
+
+
+    async function saveButtonPressed() {
+        validateDeviceId();
+        if (deviceIdError === '') {
             navigation.navigate('Home',
                 {
-                    device_id: deviceId!,
+                    deviceId: deviceId.current!,
                     latitude: Number(latitude!),
                     longitude: Number(longitude!),
                     what3words: what3words!,
                 })
-        }else{
-            setTriggerDeviceIDError(true);
         }
     };
 
-    function onLatLngChange(latitude: string, longitude: string) {
+    async function onLatLngChange(latitude: string, longitude: string) {
         setLatitude(latitude);
         setLongitude(longitude);
         const fetchWhat3Words = async () => {
@@ -78,6 +92,25 @@ const MarkerDetails: FC = () => {
             .catch(console.error);
     }
 
+    async function onDeviceIdChange(text: string) {
+        deviceId.current = text;
+        validateDeviceId();
+    }
+
+    async function validateDeviceId() {
+        if (deviceId.current) {
+            if (existingDeviceIDs.includes(deviceId.current)) {
+                setDeviceIdError('must unique');
+            } else {
+                setDeviceIdError('');
+            }
+        } else {
+            setDeviceIdError('empty');
+        }
+    }
+
+
+
     return (
         <TextInputAvoidingView>
             <ScreenWrapper
@@ -86,8 +119,9 @@ const MarkerDetails: FC = () => {
             >
                 <View style={styles.mainContainer}>
                     <DeviceIDTextInput
-                        onChangeText={setDeviceId}
-                        triggerError={triggerDeviceIDError}
+                        onChangeText={onDeviceIdChange}
+                        errorType={deviceIdError}
+                    // triggerError={triggerDeviceIDError}
                     />
                     <LocationCard
                         latitude={latitude}
@@ -123,7 +157,7 @@ const MarkerDetails: FC = () => {
                                 icon="close-box-outline"
                                 mode="elevated"
                                 buttonColor={theme.colors.inversePrimary}
-                                onPress={() => {navigation.goBack()}}
+                                onPress={() => { navigation.goBack() }}
                                 style={styles.button}
                                 labelStyle={styles.fontStyle}
                             >
