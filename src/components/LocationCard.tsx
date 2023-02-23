@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useMemo } from 'react';
 import {
     View,
     StyleSheet,
@@ -26,7 +26,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
     const [_latitude,setLatitude] = useState<string>(latitude);
     const [_longitude,setLongitude] = useState<string>(longitude);
 
-    useEffect(() => {
+    useMemo(() => {
         onLatLngChange(_latitude,_longitude);
     }, [_latitude, _longitude]);
 
