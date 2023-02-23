@@ -1,4 +1,4 @@
-import { useState, useEffect,useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     View,
     StyleSheet,
@@ -14,27 +14,39 @@ import {
 } from 'react-native-paper';
 
 
-interface LocationCardProps {
+interface CommonLocationCardProps {
     latitude: string,
     longitude: string,
-    what3words: string | undefined,
-    onLatLngChange: (lat: string, lng: string) => void
+    what3words?: string,
 }
-const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3words, onLatLngChange }) => {
+
+type ConditionalLocationCardProps =
+    | {
+        onLatLngChange?: (lat: string, lng: string) => void,
+        readonly?: never,
+    }
+    | {
+        readonly?: true,
+        onLatLngChange?: never,
+    }
+
+type LocationCardProps = CommonLocationCardProps & ConditionalLocationCardProps;
+
+const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3words, readonly, onLatLngChange }) => {
     const theme = useTheme();
 
-    const [_latitude,setLatitude] = useState<string>(latitude);
-    const [_longitude,setLongitude] = useState<string>(longitude);
+    const [_latitude, setLatitude] = useState<string>(latitude);
+    const [_longitude, setLongitude] = useState<string>(longitude);
 
     useMemo(() => {
-        onLatLngChange(_latitude,_longitude);
+        onLatLngChange!(_latitude, _longitude);
     }, [_latitude, _longitude]);
 
     return (
         <Card
             mode='elevated'
             style={styles.inputContainerStyle}
-            onPress={()=>{}}
+            onPress={() => { }}
         >
             <Card.Title
                 title="Location"
@@ -96,18 +108,18 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
     },
     latlng: {
-        flex:1,
+        flex: 1,
         height: 90,
         justifyContent: 'center',
         alignItems: 'center',
     },
     textInput: {
-        width:'90%',
+        width: '90%',
         fontSize: 22
     },
-    text:{
+    text: {
         fontSize: 20,
-        margin:10
+        margin: 10
     }
 });
 
