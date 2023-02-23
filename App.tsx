@@ -6,10 +6,11 @@ import {
   MD3DarkTheme as DarkTheme,
 } from 'react-native-paper';
 
-import MD3OrangeLight from './src/assets/themes/OrangeLightTheme.json'
-import MD3BlueDark from './src/assets/themes/BlueDarkTheme.json'
+import MD3OrangeLight from './src/assets/styles/OrangeLightTheme.json'
+import MD3BlueDark from './src/assets/styles/BlueDarkTheme.json'
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import App from './src/RootNavigator'
 
@@ -35,9 +36,6 @@ const theme = {
 export default function UmbrellaPeat() {
   return (
     <PaperProvider
-      settings={{
-        icon: props => <MaterialIcons {...props} />,
-      }}
       theme={getTheme()}>
       <App />
     </PaperProvider>
