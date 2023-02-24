@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
-    View,
     StyleSheet,
-    // TextInput
 } from "react-native"
 
 import {
     Card,
     IconButton,
-    Text,
-    TextInput,
     useTheme
 } from 'react-native-paper';
 
