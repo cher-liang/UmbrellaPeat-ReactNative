@@ -11,11 +11,9 @@ import {
 
 
 interface NavigateAndDeleteButtonsProps {
-    // deviceId: string,
-    // timestamp: Date,
-    // edited_timestamp?: Date,
+    onDeleteButtonPressed:()=>void,
 }
-const NavigateAndDeleteButtons: React.FC<NavigateAndDeleteButtonsProps> = ({ }) => {
+const NavigateAndDeleteButtons: React.FC<NavigateAndDeleteButtonsProps> = ({onDeleteButtonPressed }) => {
     const theme = useTheme();
 
 
@@ -37,7 +35,7 @@ const NavigateAndDeleteButtons: React.FC<NavigateAndDeleteButtonsProps> = ({ }) 
                     icon="delete"
                     mode="elevated"
                     buttonColor={theme.colors.error}
-                    onPress={() => {}}
+                    onPress={onDeleteButtonPressed}
                     style={styles.button}
                     labelStyle={{color: theme.colors.onPrimary,...styles.fontStyle}}
                 >

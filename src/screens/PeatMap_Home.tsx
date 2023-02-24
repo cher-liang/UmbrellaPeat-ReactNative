@@ -222,11 +222,27 @@ const PeatMap_Home: FC = () => {
     setAnimateCameraTo(null)
   }
 
-
   const onMarkerCalloutPress = async (markerId: string) => {
     setModalMarkerId(markerId);
     setModalVisible(true);
     // const marker = await AsyncStorage.getItem(markerId);
+  }
+
+  function onMarkerDelete(deviceId: string) {
+    setMarkers(markers.filter(function (marker) {
+      return marker.title !== deviceId;
+    }));
+
+    try {
+      AsyncStorage.removeItem(deviceId);
+    } catch (e) {
+      if (hasMessage(e)) {
+        console.error('Caught error: ' + (e.message || e));
+      } else {
+        console.error('Unknown error: ' + e);
+      }
+    }
+    setModalVisible(false);
   }
 
   return (
@@ -236,6 +252,7 @@ const PeatMap_Home: FC = () => {
         visible={modalVisible}
         markerId={modalMarkerId}
         onDismiss={() => { setModalVisible(false) }}
+        onMarkerDelete={onMarkerDelete}
       />
 
       <MapView
