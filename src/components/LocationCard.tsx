@@ -39,8 +39,26 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
     const [_longitude, setLongitude] = useState<string>(longitude);
 
     useMemo(() => {
-        onLatLngChange!(_latitude, _longitude);
+        if (!readonly) {
+            onLatLngChange!(_latitude, _longitude);
+        }
     }, [_latitude, _longitude]);
+
+    function getLatitude() {
+        if (!readonly) {
+            return _latitude;
+        } else {
+            return latitude;
+        }
+    }
+
+    function getLongitude() {
+        if (!readonly) {
+            return _longitude;
+        } else {
+            return longitude;
+        }
+    }
 
     return (
         <Card
@@ -61,20 +79,22 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
                         <TextInput
                             mode='outlined'
                             label='Latitude'
-                            value={_latitude}
+                            value={getLatitude()}
                             style={{ backgroundColor: theme.colors.onSecondary, ...styles.textInput }}
                             theme={{ roundness: 10 }}
                             onChangeText={setLatitude}
+                            editable={!readonly}
                         />
                     </View>
                     <View style={styles.latlng}>
                         <TextInput
                             mode='outlined'
-                            label='Latitude'
-                            value={_longitude}
+                            label='Longtiude'
+                            value={getLongitude()}
                             style={{ backgroundColor: theme.colors.onSecondary, ...styles.textInput }}
                             theme={{ roundness: 10 }}
                             onChangeText={setLongitude}
+                            editable={!readonly}
                         />
                     </View>
                 </View>
@@ -109,7 +129,7 @@ const styles = StyleSheet.create({
     },
     latlng: {
         flex: 1,
-        height: 90,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -119,7 +139,9 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 20,
-        margin: 10
+        marginLeft: 10,
+        marginTop: 20,
+        // margin: 10,
     }
 });
 
