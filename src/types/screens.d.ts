@@ -7,7 +7,7 @@ import type { StackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: {
-    device_id: string;
+    deviceId: string;
     latitude: number;
     longitude: number;
     what3words: string;

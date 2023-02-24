@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, FC } from 'react';
+import React, { useEffect, useRef, useMemo, useState, FC } from 'react';
 import {
   Alert,
   StyleSheet,
@@ -187,11 +187,11 @@ const PeatMap_Home: FC = () => {
       const temp_markers: MapMarkerProps[] = [];
       values.map((value) => {
         const data = JSON.parse(value[1]!);
-        
+
         temp_markers.push({
           title: data['deviceId'],
           description: data['what3words'],
-          coordinate: {latitude:data['latitude'],longitude:data['longitude']}
+          coordinate: { latitude: data['latitude'], longitude: data['longitude'] }
         })
       });
       setMarkers(temp_markers);
@@ -228,20 +228,16 @@ const PeatMap_Home: FC = () => {
     setModalVisible(true);
     // const marker = await AsyncStorage.getItem(markerId);
   }
-  // function onMarkerCalloutPress(markerId:string) {
-  //   AsyncStorage.getItem()
-  // }
 
   return (
     <View style={styles.mainContainer}>
-      {/* {
-        modalVisible &&
-        <MarkerCalloutModal
-          visible={true}
-          markerId={modalMarkerId}
-          onDismiss={() => { setModalVisible(false) }}
-        />
-      } */}
+
+      <MarkerCalloutModal
+        visible={modalVisible}
+        markerId={modalMarkerId}
+        onDismiss={() => { setModalVisible(false) }}
+      />
+
       <MapView
         // coords={location?.coords || null}
         markers={markers}
