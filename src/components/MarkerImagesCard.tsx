@@ -26,7 +26,6 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ }) => {
     return (
         <Card
             mode='elevated'
-            style={styles.inputContainerStyle}
             onPress={() => { }}
         >
             <Card.Title
@@ -44,9 +43,6 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ }) => {
 }
 
 const styles = StyleSheet.create({
-    inputContainerStyle: {
-        flex: 1,
-    },
     title: {
         fontSize: 25,
         top: 7

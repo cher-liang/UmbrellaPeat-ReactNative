@@ -80,18 +80,26 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
                 onDismiss={onDismiss}
                 contentContainerStyle={styles.contentContainerStyle}
             >
+                <View style={styles.markerInfoContainer}>
                 <MarkerInfoCard
                     deviceId={deviceId}
                     timestamp={new Date(timestamp)}
                 />
-                <LocationCard
-                    latitude={latitude}
-                    longitude={longitude}
-                    what3words={what3words}
-                    readonly
-                />
-                <MarkerImagesCard
-                />
+                </View>
+                <View style={styles.cardContainer}>
+
+                    <LocationCard
+                        latitude={latitude}
+                        longitude={longitude}
+                        what3words={what3words}
+                        readonly
+                    />
+                </View>
+                <View style={styles.cardContainer}>
+                    <MarkerImagesCard
+                    />
+                </View>
+
                 <NavigateAndDeleteButtons
                     onDeleteButtonPressed={onDeleteButtonPressed}
                 />
@@ -106,6 +114,15 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 10,
         marginVertical: 80,
+        rowGap: 10
+    },
+    markerInfoContainer:{
+        paddingHorizontal: 10,
+    },
+    cardContainer: {
+        flex: 1,
+        maxHeight: '40%',
+        paddingHorizontal: 10,
     },
 });
 

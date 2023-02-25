@@ -54,14 +54,15 @@ const styles = StyleSheet.create({
 
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-between',
         alignItems: 'stretch',
     },
     buttonContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        marginHorizontal: 10,
+        // marginHorizontal: 10,
+        maxWidth:'48%',
     },
     button: {
         flex: 1,

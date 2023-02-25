@@ -25,7 +25,6 @@ const MarkerInfoCard: React.FC<MarkerInfoCardProps> = ({ deviceId,timestamp,edit
     return (
         <Card
             mode='elevated'
-            style={styles.inputContainerStyle}
             onPress={() => { }}
         >
             <Card.Title
@@ -42,10 +41,6 @@ const MarkerInfoCard: React.FC<MarkerInfoCardProps> = ({ deviceId,timestamp,edit
 }
 
 const styles = StyleSheet.create({
-    inputContainerStyle: {
-        // flex: 1,
-        margin: 10,
-    },
     title: {
         fontSize: 25,
         top: 7

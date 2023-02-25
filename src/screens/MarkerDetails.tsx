@@ -134,7 +134,6 @@ const MarkerDetails: FC = () => {
             </View>
             <View style={styles.mainContainer }>
 
-                
                 <View style={styles.cardContainer}>
 
                     <LocationCard
@@ -179,9 +178,6 @@ const MarkerDetails: FC = () => {
                     </View>
                 </View>
             </View>
-
-            {/* </ScreenWrapper>
-        </TextInputAvoidingView> */}
         </View>
 
     );
@@ -197,39 +193,40 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         rowGap: 30,
         paddingVertical:30,
+        paddingHorizontal: 25,
     },
     cardContainer: {
         flex: 1,
         maxHeight: '40%',
-        paddingHorizontal: 25,
     },
     header: {
         flex: 1,
         marginTop: 20,
-        paddingHorizontal: 25,
+        paddingHorizontal: 25,  
         justifyContent: 'flex-start',
     },
     footer: {
         flex: 1,
         marginBottom: 20,
+        paddingHorizontal: 25,  
         justifyContent: 'flex-end',
     },
     fiftyPercentContainer: {
         flex: 1,
-        margin: 10,
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-between',
         alignItems: 'stretch',
     },
     fiftyPercent: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        marginHorizontal: 10,
+        maxWidth:'48%',
     },
     button: {
         flex: 1,
+        maxHeight:50,
     },
     fontStyle: {
         fontSize: 22,
