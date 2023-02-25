@@ -115,7 +115,6 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
 const styles = StyleSheet.create({
     inputContainerStyle: {
         flex: 1,
-        margin: 10,
     },
     title: {
         fontSize: 25,
@@ -141,7 +140,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 10,
         marginTop: 20,
-        // margin: 10,
     }
 });
 

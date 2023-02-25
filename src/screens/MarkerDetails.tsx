@@ -45,6 +45,7 @@ const MarkerDetails: FC = () => {
     const route = useRoute<MarkerDetailsRouteProps>();
 
     const deviceId = useRef('');
+    const [deviceIdState,setDeviceIdState] = useState('');
     const [latitude, setLatitude] = useState(route.params.latitude.toFixed(5).toString());
     const [longitude, setLongitude] = useState(route.params.longitude.toFixed(5).toString());
     const [what3words, setWhat3Words] = useState<string>();
@@ -70,7 +71,8 @@ const MarkerDetails: FC = () => {
 
 
     async function saveButtonPressed() {
-        validateDeviceId();
+        const deviceIdError = await validateDeviceId()
+
         if (deviceIdError === '') {
             navigation.navigate('Home',
                 {
@@ -79,6 +81,8 @@ const MarkerDetails: FC = () => {
                     longitude: Number(longitude!),
                     what3words: what3words!,
                 })
+        } else {
+            setDeviceIdError(deviceIdError);
         }
     };
 
@@ -92,83 +96,94 @@ const MarkerDetails: FC = () => {
             .catch(console.error);
     }
 
+    function onClearDeviceId(){
+        setDeviceIdState("");
+    }
+
     async function onDeviceIdChange(text: string) {
+        setDeviceIdState(text)
         deviceId.current = text;
-        validateDeviceId();
+        setDeviceIdError(await validateDeviceId());
     }
 
     async function validateDeviceId() {
         if (deviceId.current) {
             if (existingDeviceIDs.includes(deviceId.current)) {
-                setDeviceIdError('must unique');
+                return 'must unique';
             } else {
-                setDeviceIdError('');
+                return '';
             }
         } else {
-            setDeviceIdError('empty');
+            return 'empty';
         }
     }
 
 
 
     return (
-        <TextInputAvoidingView>
-            <ScreenWrapper
-                keyboardShouldPersistTaps={'never'}
-                removeClippedSubviews={false}
-            >
-                <View style={styles.mainContainer}>
-                    <DeviceIDTextInput
-                        onChangeText={onDeviceIdChange}
-                        errorType={deviceIdError}
-                    // triggerError={triggerDeviceIDError}
-                    />
+        <View style={{ backgroundColor: theme.colors.onPrimary,...styles.wrapper }}>
+
+            <View style={styles.header}>
+            <DeviceIDTextInput
+                    onChangeText={onDeviceIdChange}
+                    onClearText={onClearDeviceId}
+                    deviceId={deviceIdState}
+                    errorType={deviceIdError}
+                />
+
+            </View>
+            <View style={styles.mainContainer }>
+
+                
+                <View style={styles.cardContainer}>
+
                     <LocationCard
                         latitude={latitude}
                         longitude={longitude}
                         what3words={what3words}
                         onLatLngChange={onLatLngChange}
                     />
-                    <MarkerImagesCard />
-                    {/* <LocationCard
-                        latitude={latitude}
-                        longitude={longitude}
-                        what3words={what3words}
-                        onLatLngChange={onLatLngChange}
-                    /> */}
-
                 </View>
-                <View style={styles.footer}>
+                <View style={styles.cardContainer}>
 
-                    <View style={styles.fiftyPercentContainer}>
-                        <View style={styles.fiftyPercent}>
-                            <Button
-                                icon="content-save-outline"
-                                mode="elevated"
-                                onPress={saveButtonPressed}
-                                style={styles.button}
-                                labelStyle={styles.fontStyle}
-                            >
-                                Save
-                            </Button>
-                        </View>
-                        <View style={styles.fiftyPercent}>
-                            <Button
-                                icon="close-box-outline"
-                                mode="elevated"
-                                buttonColor={theme.colors.inversePrimary}
-                                onPress={() => { navigation.goBack() }}
-                                style={styles.button}
-                                labelStyle={styles.fontStyle}
-                            >
-                                Cancel
-                            </Button>
-                        </View>
+                    <MarkerImagesCard />
+                </View>
+
+
+            </View>
+            <View style={styles.footer}>
+
+                <View style={styles.fiftyPercentContainer}>
+                    <View style={styles.fiftyPercent}>
+                        <Button
+                            icon="content-save-outline"
+                            mode="elevated"
+                            onPress={saveButtonPressed}
+                            style={styles.button}
+                            labelStyle={styles.fontStyle}
+                        >
+                            Save
+                        </Button>
+                    </View>
+                    <View style={styles.fiftyPercent}>
+                        <Button
+                            icon="close-box-outline"
+                            mode="elevated"
+                            buttonColor={theme.colors.inversePrimary}
+                            onPress={() => { navigation.goBack() }}
+                            style={styles.button}
+                            labelStyle={styles.fontStyle}
+                        >
+                            Cancel
+                        </Button>
                     </View>
                 </View>
+            </View>
 
-            </ScreenWrapper>
-        </TextInputAvoidingView>
+            {/* </ScreenWrapper>
+        </TextInputAvoidingView> */}
+        </View>
+
     );
 };
 
@@ -177,11 +192,22 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        flex: 1,
-        marginVertical: 20,
-        marginHorizontal: 10,
+        flex: 7,
         flexDirection: 'column',
-        justifyContent: 'space-evenly'
+        justifyContent: 'flex-start',
+        rowGap: 30,
+        paddingVertical:30,
+    },
+    cardContainer: {
+        flex: 1,
+        maxHeight: '40%',
+        paddingHorizontal: 25,
+    },
+    header: {
+        flex: 1,
+        marginTop: 20,
+        paddingHorizontal: 25,
+        justifyContent: 'flex-start',
     },
     footer: {
         flex: 1,
