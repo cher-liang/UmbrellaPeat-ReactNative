@@ -1,35 +1,52 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GeoCoordinates } from 'react-native-geolocation-service';
-import RNMapView, { Circle, Marker, MapMarkerProps } from 'react-native-maps';
+import MapView, { Circle, Marker, MapMarkerProps, PROVIDER_GOOGLE, MapStyleElement, LatLng, LongPressEvent, CalloutPressEvent } from 'react-native-maps';
 
 interface MapViewProps {
-  coords: GeoCoordinates | null;
-  markers: MapMarkerProps[];
+  // coords: GeoCoordinates | null;
+  markers: MapMarkerProps[] | null;
+  customMapStyle: MapStyleElement[];
+  animateCameraTo: LatLng | null;
+  onMarkerCalloutPress: (markerId: string) => void;
 }
 
-const MapView = ({ coords, markers }: MapViewProps) => {
-  const mapRef = useRef<RNMapView>(null);
+const PeatMapView = ({
+  markers,
+  customMapStyle,
+  animateCameraTo,
+  onMarkerCalloutPress
+}: MapViewProps) => {
 
-  useEffect(() => {
-    if (!!coords && mapRef.current) {
-      mapRef.current.animateCamera({
-        center: {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        },
-        pitch: 0,
-        heading: 0,
-        altitude: 1000,
-        zoom: 16,
-      });
-    }
-  }, [coords]);
+  const mapRef = useRef<MapView>(null);
+
+  if (!!animateCameraTo && mapRef.current) {
+    mapRef.current.animateCamera({
+      center: {
+        latitude: animateCameraTo.latitude,
+        longitude: animateCameraTo.longitude,
+      },
+      pitch: 0,
+      heading: 0,
+      altitude: 1000,
+      zoom: 17,
+    });
+  }
+
+  // function testlongpress(event:LongPressEvent){
+  //   console.log(event.nativeEvent.coordinate);
+  // }
+
+  function onCalloutPress(markerId: string) {
+    onMarkerCalloutPress(markerId);
+  }
 
   return (
     <View style={styles.container}>
-      <RNMapView
+      <MapView
         ref={mapRef}
+        style={styles.mapView}
+        provider={PROVIDER_GOOGLE}
         initialCamera={{
           altitude: 15000,
           center: {
@@ -38,96 +55,40 @@ const MapView = ({ coords, markers }: MapViewProps) => {
           },
           heading: 0,
           pitch: 0,
-          zoom: 11,
+          zoom: 18,
         }}
-        loadingEnabled
-        loadingBackgroundColor="white"
-        style={StyleSheet.absoluteFillObject}
-        rotateEnabled={false}>
-        {!!coords && (
-          <>
-            <Marker
-              anchor={{ x: 0.5, y: 0.6 }}
-              coordinate={{
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-              }}
-              flat
-              style={{
-                ...(coords.heading !== -1 && {
-                  transform: [
-                    {
-                      rotate: `${coords.heading}deg`,
-                    },
-                  ],
-                }),
-              }}>
-              <View style={styles.dotContainer}>
-                <View style={[styles.arrow]} />
-                <View style={styles.dot} />
-              </View>
-            </Marker>
-            <Circle
-              center={{
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-              }}
-              radius={coords.accuracy}
-              strokeColor="rgba(0, 150, 255, 0.5)"
-              fillColor="rgba(0, 150, 255, 0.5)"
-            />
-          </>
-        )}
+        showsUserLocation={true}
+        userLocationUpdateInterval={5000}
+        userLocationFastestInterval={3000}
+        showsCompass={false}
+        showsMyLocationButton={false}
+        customMapStyle={customMapStyle}
+      // onLongPress={testlongpress}
+      >
         {!!markers && (
-          markers.map((marker, index) => <Marker
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            description={marker.description}
-            tracksViewChanges={false}
-          ></Marker>)
+          markers.map((marker, index) =>
+            <Marker
+              key={marker.title}
+              coordinate={marker.coordinate}
+              title={marker.title}
+              description={marker.description}
+              tracksViewChanges={false}
+              // onPress={(event)=>{console.log(event.nativeEvent)}}
+              onCalloutPress={() => { onCalloutPress(marker.title!) }}
+            />)
         )}
-      </RNMapView>
+      </MapView>
     </View>
   );
 };
 
-export default MapView;
+export default PeatMapView;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  dotContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dot: {
-    backgroundColor: 'rgb(0, 120, 255)',
-    width: 24,
-    height: 24,
-    borderWidth: 3,
-    borderColor: 'white',
-    borderRadius: 12,
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 1,
-      height: 1,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 1.5,
-    elevation: 4,
-  },
-  arrow: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderBottomWidth: 10,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'rgb(0, 120, 255)',
+  mapView: {
+    ...StyleSheet.absoluteFillObject,
   },
 });

@@ -10,7 +10,7 @@ import { LatLng, MapMarkerProps } from 'react-native-maps';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import MapView from '../components/MapView2';
+import MapView from '../components/MapView';
 import AddMarkerButton from '../components/AddMarkerButton';
 import MyLocationButton from '../components/MyLocationButton';
 import MarkerCalloutModal from '../components/MarkerCalloutModal';
