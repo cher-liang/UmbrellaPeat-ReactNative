@@ -21,19 +21,17 @@ import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import RNFS from 'react-native-fs';
 
 import hasAndroidPermission from '../utils/RequestCameraRollPermission'
 
 interface MarkerImagesCardProps {
-    // latitude: string,
-    // longitude: string,
-    // what3words: string | undefined,
-    // onLatLngChange: (lat: string, lng: string) => void
+    onPhotoURIsChange: (photoURIs:string[])=>void,
 }
-const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ }) => {
+const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange }) => {
     const theme = useTheme();
     const [photoURIs, setPhotoURIs] = useState<string[]>([]);
+
+    useMemo(()=>{onPhotoURIsChange(photoURIs)},[photoURIs]);
 
     async function getPhotos() {
         if (Platform.OS === "android" && !(await hasAndroidPermission())) {
@@ -41,7 +39,7 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ }) => {
         }
 
         const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 });
-        if (!result.didCancel){
+        if (!result.didCancel){           
             setPhotoURIs(photoURIs.concat(result!.assets!.map(asset => asset!["uri"]!)));
         }
     }
