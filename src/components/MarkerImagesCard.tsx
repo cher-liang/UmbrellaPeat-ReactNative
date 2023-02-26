@@ -24,14 +24,28 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 import hasAndroidPermission from '../utils/RequestCameraRollPermission'
 
-interface MarkerImagesCardProps {
-    onPhotoURIsChange: (photoURIs:string[])=>void,
+interface CommonMarkerImagesCardProps {
+    compact?: true
 }
-const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange }) => {
+type ConditionalMarkerImagesCardProps =
+    | {
+        onPhotoURIsChange: (photoURIs: string[]) => void,
+        readonly?: never,
+        displayPhotoURIs?: never,
+    }
+    | {
+        readonly: true,
+        displayPhotoURIs: string[],
+        onPhotoURIsChange?: never,
+    }
+
+type MarkerImagesCardProps = CommonMarkerImagesCardProps & ConditionalMarkerImagesCardProps;
+
+const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ readonly, compact, displayPhotoURIs,onPhotoURIsChange }) => {
     const theme = useTheme();
     const [photoURIs, setPhotoURIs] = useState<string[]>([]);
 
-    useMemo(()=>{onPhotoURIsChange(photoURIs)},[photoURIs]);
+    useMemo(() => { if (!readonly) { onPhotoURIsChange!(photoURIs); } }, [photoURIs]);
 
     async function getPhotos() {
         if (Platform.OS === "android" && !(await hasAndroidPermission())) {
@@ -39,13 +53,31 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange })
         }
 
         const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 });
-        if (!result.didCancel){           
+        if (!result.didCancel) {
             setPhotoURIs(photoURIs.concat(result!.assets!.map(asset => asset!["uri"]!)));
         }
     }
 
+    function renderImagesOnly(){
+        const ImagesOnly:JSX.Element[] = [];
+        for (let i in displayPhotoURIs!){
+            ImagesOnly.push(imageContainer(`images_${i}`,displayPhotoURIs[i]))
+        }
+        return (
+            <ScrollView
+                style={styles.contentContainerCompactPadding}
+                horizontal
+            >
+                {
+                    ImagesOnly
+                }
+            </ScrollView>);
+    }
+
+    
+
     function renderImagesAndButtons() {
-        const ButtonsOrImages: JSX.Element[] = []
+        const ButtonsOrImages: JSX.Element[] = [];
 
         for (let i in photoURIs) {
             ButtonsOrImages.push(imageContainer(`images_${i}`, photoURIs[i]))
@@ -53,23 +85,23 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange })
         for (let i = 0; i < (3 - photoURIs?.length!); i++) {
             ButtonsOrImages.push(addImageButton(`buttons_${i}`));
         }
-        if (photoURIs?.length){
+        if (photoURIs?.length) {
             ButtonsOrImages.push(deleteButton())
         }
 
         return (
-        <ScrollView
-            style={styles.contentContainer}
-            horizontal
-        >
-            {
-                ButtonsOrImages
-            }
-        </ScrollView>);
+            <ScrollView
+                style={styles.contentContainer}
+                horizontal
+            >
+                {
+                    ButtonsOrImages
+                }
+            </ScrollView>);
 
     }
 
-    function addImageButton(key: string):JSX.Element {
+    function addImageButton(key: string): JSX.Element {
         return (
             <TouchableOpacity
                 key={key}
@@ -81,19 +113,19 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange })
         )
     }
 
-    function deleteButton():JSX.Element {
+    function deleteButton(): JSX.Element {
         return (
             <TouchableOpacity
                 key={'delete'}
                 style={{ backgroundColor: theme.colors.error, ...styles.buttonOrImageContainer }}
-                onPress={()=>{setPhotoURIs([])}}
+                onPress={() => { setPhotoURIs([]) }}
             >
                 <Icons name="delete-empty" color={theme.colors.onError} size={38} />
             </TouchableOpacity>
         )
     }
 
-    function imageContainer(key: string, uri: string):JSX.Element {
+    function imageContainer(key: string, uri: string): JSX.Element {
         return (
             <TouchableWithoutFeedback key={key}>
                 <Image
@@ -112,15 +144,18 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({onPhotoURIsChange })
             contentStyle={styles.cardContentStyle}
             onPress={() => { }}
         >
-            <Card.Title
-                title="Images"
-                titleVariant='titleMedium'
-                titleStyle={styles.title}
-                left={(props) => <IconButton size={props.size - 5} icon="image-multiple" />}
-            />
+            {!compact
+                && <Card.Title
+                    title="Images"
+                    titleVariant='titleMedium'
+                    titleStyle={styles.title}
+                    left={(props) => <IconButton size={props.size - 5} icon="image-multiple" />}
+                />
+            }
             <View style={{ flex: 5 }}>
-                {
-                    renderImagesAndButtons()
+                {readonly
+                    ?renderImagesOnly()
+                    :renderImagesAndButtons()
                 }
             </View>
         </Card>
@@ -140,20 +175,22 @@ const styles = StyleSheet.create({
         top: 7
     },
     contentContainer: {
-        // flexGrow:1,
         flexDirection: "row",
-        // justifyContent:"space-between",
-        // backgroundColor:'yellow',
         width: '100%',
-        // rowGap:10,  
         paddingHorizontal: 25,
-        paddingBottom: 15,
+        paddingBottom: 20,
+    },
+    contentContainerCompactPadding: {
+        flexDirection: "row",
+        width: '100%',
+        paddingHorizontal: 10,
+        paddingVertical: 20,
     },
     buttonOrImageContainer: {
         padding: 10,
         marginLeft: 10,
         borderRadius: 10,
-        height: '90%',
+        height: '100%',
         width: 120,
         justifyContent: 'center',
         alignItems: 'center',

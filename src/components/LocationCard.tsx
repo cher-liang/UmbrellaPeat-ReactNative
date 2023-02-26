@@ -18,8 +18,8 @@ interface CommonLocationCardProps {
     latitude: string,
     longitude: string,
     what3words?: string,
+    compact?: true
 }
-
 type ConditionalLocationCardProps =
     | {
         onLatLngChange?: (lat: string, lng: string) => void,
@@ -32,7 +32,7 @@ type ConditionalLocationCardProps =
 
 type LocationCardProps = CommonLocationCardProps & ConditionalLocationCardProps;
 
-const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3words, readonly, onLatLngChange }) => {
+const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3words, readonly, compact, onLatLngChange }) => {
     const theme = useTheme();
 
     const [_latitude, setLatitude] = useState<string>(latitude);
@@ -63,15 +63,17 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
     return (
         <Card
             mode='elevated'
-            style={styles.inputContainerStyle}
+            style={(compact)?styles.inputContainerStyleWithPadding:styles.inputContainerStyle}
             onPress={() => { }}
         >
-            <Card.Title
-                title="Location"
-                titleVariant='titleMedium'
-                titleStyle={styles.title}
-                left={(props) => <IconButton {...props} icon="map-marker" />}
-            />
+            {!compact
+                && <Card.Title
+                    title="Location"
+                    titleVariant='titleMedium'
+                    titleStyle={styles.title}
+                    left={(props) => <IconButton {...props} icon="map-marker" />}
+                />
+            }
             <Card.Content>
                 <View style={styles.latlngContainer}>
 
@@ -101,7 +103,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
                 <Text
                     adjustsFontSizeToFit
                     numberOfLines={1}
-                    style={styles.text}
+                    style={compact?styles.textCompact:styles.text}
                 >
                     <Text style={{ color: 'red' }}>///</Text>
                     {what3words}
@@ -116,9 +118,16 @@ const styles = StyleSheet.create({
     inputContainerStyle: {
         flex: 1,
     },
+    inputContainerStyleWithPadding: {
+        flex: 1,
+        paddingVertical: 20,
+    },
     title: {
         fontSize: 25,
         top: 7
+    },
+    titleCompact: {
+        fontSize: 20
     },
     latlngContainer: {
         flexDirection: 'row',
@@ -140,6 +149,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 10,
         marginTop: 20,
+    },
+    textCompact:{
+        fontSize: 20,
+        marginLeft: 10,
+        marginTop: 10,
     }
 });
 
