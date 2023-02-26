@@ -121,7 +121,7 @@ const MarkerDetails: FC = () => {
 
 
     return (
-        <View style={{ backgroundColor: theme.colors.onPrimary,...styles.wrapper }}>
+        <View style={{ backgroundColor: theme.colors.background,...styles.wrapper }}>
 
             <View style={styles.header}>
             <DeviceIDTextInput
@@ -143,8 +143,7 @@ const MarkerDetails: FC = () => {
                         onLatLngChange={onLatLngChange}
                     />
                 </View>
-                <View style={styles.cardContainer}>
-
+                <View style={styles.cardContainer2}>
                     <MarkerImagesCard />
                 </View>
 
@@ -198,6 +197,10 @@ const styles = StyleSheet.create({
     cardContainer: {
         flex: 1,
         maxHeight: '40%',
+    },
+    cardContainer2: {
+        flex: 1,
+        maxHeight: '50%',
     },
     header: {
         flex: 1,
