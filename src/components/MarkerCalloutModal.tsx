@@ -13,6 +13,8 @@ import {
     Text,
     useTheme
 } from 'react-native-paper';
+import ImageView from "react-native-image-viewing";
+
 
 import hasMessage from '../utils/CatchErrorMessage';
 
@@ -39,6 +41,9 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
     const [longitude, setLongitude] = useState('');
     const [what3words, setWhat3Words] = useState('');
     const [photoURIs, setPhotoURIs] = useState<string[]>([]);
+
+    const [imageViewVisible, setImageViewVisible] = useState(false);
+
 
     useEffect(() => {
         const fetchMarkerDataFromAsyncStorage = async () => {
@@ -103,11 +108,19 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
                         readonly
                         compact
                         displayPhotoURIs={photoURIs}
+                        onImagePress={() => { setImageViewVisible(true) }}
                     />
                 </View>
 
                 <NavigateAndDeleteButtons
                     onDeleteButtonPressed={onDeleteButtonPressed}
+                />
+
+                <ImageView
+                    images={photoURIs.map(photoURI => { return { uri: photoURI } })}
+                    imageIndex={0}
+                    visible={imageViewVisible}
+                    onRequestClose={() => setImageViewVisible(false)}
                 />
             </Modal>
         </Portal>

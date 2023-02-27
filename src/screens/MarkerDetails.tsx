@@ -8,15 +8,15 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { Button, useTheme } from 'react-native-paper';
+import ImageView from "react-native-image-viewing";
+
+import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
 
 import get3Words from '../services/What3Words';
 
-import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
-import ScreenWrapper from '../ScreenWrapper';
-
 import DeviceIDTextInput from '../components/DeviceIDTextInput';
 import LocationCard from '../components/LocationCard';
-import { Button, useTheme } from 'react-native-paper';
 import MarkerImagesCard from '../components/MarkerImagesCard';
 
 import hasMessage from '../utils/CatchErrorMessage';
@@ -52,6 +52,7 @@ const MarkerDetails: FC = () => {
     const [what3words, setWhat3Words] = useState<string>();
 
     const [photoURIs, setPhotoURIs] = useState<string[]>([]);
+    const [imageViewVisible, setImageViewVisible] = useState(false);
 
     const [existingDeviceIDs, setExistingDeviceIDs] = useState<readonly string[]>([]);
     const [deviceIdError, setDeviceIdError] = useState<'must unique' | 'empty' | ''>('');
@@ -77,7 +78,7 @@ const MarkerDetails: FC = () => {
         const deviceIdError = await validateDeviceId()
 
         if (deviceIdError === '') {
-            const savedPhotoURIs =await Promise.all(photoURIs.map(async photoURI => {
+            const savedPhotoURIs = await Promise.all(photoURIs.map(async photoURI => {
                 return CameraRoll.save(photoURI, { type: 'photo', album: 'UmbrellaPeat' });
             }))
 
@@ -128,7 +129,7 @@ const MarkerDetails: FC = () => {
             <View style={styles.header}>
                 <DeviceIDTextInput
                     onChangeText={onDeviceIdChange}
-                    onClearText={()=>{setDeviceIdState("")}}
+                    onClearText={() => { setDeviceIdState("") }}
                     deviceId={deviceIdState}
                     errorType={deviceIdError}
                 />
@@ -146,7 +147,10 @@ const MarkerDetails: FC = () => {
                     />
                 </View>
                 <View style={styles.cardContainer2}>
-                    <MarkerImagesCard onPhotoURIsChange={(photoURIs: string[])=>{setPhotoURIs(photoURIs);}} />
+                    <MarkerImagesCard 
+                    onPhotoURIsChange={(photoURIs: string[]) => { setPhotoURIs(photoURIs); }} 
+                    onImagePress={()=>{setImageViewVisible(true)}}
+                    />
                 </View>
 
 
@@ -179,6 +183,12 @@ const MarkerDetails: FC = () => {
                     </View>
                 </View>
             </View>
+            <ImageView
+                images={photoURIs.map(photoURI=>{return {uri:photoURI}})}
+                imageIndex={0}
+                visible={imageViewVisible}
+                onRequestClose={() => setImageViewVisible(false)}
+            />
         </View>
 
     );

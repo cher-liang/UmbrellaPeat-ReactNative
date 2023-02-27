@@ -25,6 +25,7 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import hasAndroidPermission from '../utils/RequestCameraRollPermission'
 
 interface CommonMarkerImagesCardProps {
+    onImagePress: ()=>void,
     compact?: true
 }
 type ConditionalMarkerImagesCardProps =
@@ -41,11 +42,11 @@ type ConditionalMarkerImagesCardProps =
 
 type MarkerImagesCardProps = CommonMarkerImagesCardProps & ConditionalMarkerImagesCardProps;
 
-const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ readonly, compact, displayPhotoURIs,onPhotoURIsChange }) => {
+const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ readonly, compact, displayPhotoURIs,onPhotoURIsChange, onImagePress }) => {
     const theme = useTheme();
     const [photoURIs, setPhotoURIs] = useState<string[]>([]);
 
-    useMemo(() => { if (!readonly) { onPhotoURIsChange!(photoURIs); } }, [photoURIs]);
+    useEffect(() => { if (!readonly) { onPhotoURIsChange!(photoURIs); } }, [photoURIs]);
 
     async function getPhotos() {
         if (Platform.OS === "android" && !(await hasAndroidPermission())) {
@@ -127,7 +128,7 @@ const MarkerImagesCard: React.FC<MarkerImagesCardProps> = ({ readonly, compact, 
 
     function imageContainer(key: string, uri: string): JSX.Element {
         return (
-            <TouchableWithoutFeedback key={key}>
+            <TouchableWithoutFeedback key={key} onPress={onImagePress}>
                 <Image
                     style={styles.buttonOrImageContainer}
                     resizeMode='cover'

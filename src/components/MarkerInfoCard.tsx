@@ -32,7 +32,7 @@ const MarkerInfoCard: React.FC<MarkerInfoCardProps> = ({ deviceId,timestamp,edit
                 titleVariant='titleMedium'  
                 titleStyle={styles.title}
                 left={(props) => <IconButton size={props.size - 5} icon="view-agenda" />}
-                right={(props) => <IconButton size={props.size} icon="pencil-outline" />}
+                // right={(props) => <IconButton size={props.size} icon="pencil-outline" />}
                 subtitle={getSubtitle()}
             />
         </Card>
