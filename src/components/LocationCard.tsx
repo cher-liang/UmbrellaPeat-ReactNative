@@ -91,7 +91,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
                     <View style={styles.latlng}>
                         <TextInput
                             mode='outlined'
-                            label='Longtiude'
+                            label='Longitude'
                             value={getLongitude()}
                             style={{ backgroundColor: theme.colors.onSecondary, ...styles.textInput }}
                             theme={{ roundness: 10 }}
