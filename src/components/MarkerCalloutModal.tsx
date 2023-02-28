@@ -13,6 +13,8 @@ import {
     Text,
     useTheme
 } from 'react-native-paper';
+import ImageView from "react-native-image-viewing";
+
 
 import hasMessage from '../utils/CatchErrorMessage';
 
@@ -38,6 +40,10 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
     const [what3words, setWhat3Words] = useState('');
+    const [photoURIs, setPhotoURIs] = useState<string[]>([]);
+
+    const [imageViewVisible, setImageViewVisible] = useState(false);
+
 
     useEffect(() => {
         const fetchMarkerDataFromAsyncStorage = async () => {
@@ -52,6 +58,7 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
                         setLatitude(jsonParse['latitude'].toFixed(5).toString());
                         setLongitude(jsonParse['longitude'].toFixed(5).toString());
                         setWhat3Words(jsonParse['what3words']);
+                        setPhotoURIs(jsonParse['savedPhotoURIs'])
                     } else {
                         console.error("Error fetching ", markerId, " from AsyncStorage")
                     }
@@ -81,27 +88,39 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
                 contentContainerStyle={styles.contentContainerStyle}
             >
                 <View style={styles.markerInfoContainer}>
-                <MarkerInfoCard
-                    deviceId={deviceId}
-                    timestamp={new Date(timestamp)}
-                />
+                    <MarkerInfoCard
+                        deviceId={deviceId}
+                        timestamp={new Date(timestamp)}
+                    />
                 </View>
-                <View style={styles.cardContainer}>
+                <View style={styles.cardContainer2}>
 
                     <LocationCard
                         latitude={latitude}
                         longitude={longitude}
                         what3words={what3words}
                         readonly
+                        compact
                     />
                 </View>
                 <View style={styles.cardContainer}>
                     <MarkerImagesCard
+                        readonly
+                        compact
+                        displayPhotoURIs={photoURIs}
+                        onImagePress={() => { setImageViewVisible(true) }}
                     />
                 </View>
 
                 <NavigateAndDeleteButtons
                     onDeleteButtonPressed={onDeleteButtonPressed}
+                />
+
+                <ImageView
+                    images={photoURIs.map(photoURI => { return { uri: photoURI } })}
+                    imageIndex={0}
+                    visible={imageViewVisible}
+                    onRequestClose={() => setImageViewVisible(false)}
                 />
             </Modal>
         </Portal>
@@ -116,11 +135,16 @@ const styles = StyleSheet.create({
         marginVertical: 80,
         rowGap: 10
     },
-    markerInfoContainer:{
+    markerInfoContainer: {
         paddingHorizontal: 10,
     },
     cardContainer: {
-        flex: 1,
+        flex: 7,
+        maxHeight: '60%',
+        paddingHorizontal: 10,
+    },
+    cardContainer2: {
+        flex: 3,
         maxHeight: '40%',
         paddingHorizontal: 10,
     },

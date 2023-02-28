@@ -11,6 +11,7 @@ export type RootStackParamList = {
     latitude: number;
     longitude: number;
     what3words: string;
+    savedPhotoURIs: string[];
   };
   MarkerDetails: {
     latitude: number,

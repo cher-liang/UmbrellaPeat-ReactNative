@@ -7,15 +7,16 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { Button, useTheme } from 'react-native-paper';
+import ImageView from "react-native-image-viewing";
+
+import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
 
 import get3Words from '../services/What3Words';
 
-import { HomeRouteProps, MarkerDetailsNavigationProps, MarkerDetailsRouteProps } from '../types/screens';
-import ScreenWrapper from '../ScreenWrapper';
-
 import DeviceIDTextInput from '../components/DeviceIDTextInput';
 import LocationCard from '../components/LocationCard';
-import { Button, useTheme } from 'react-native-paper';
 import MarkerImagesCard from '../components/MarkerImagesCard';
 
 import hasMessage from '../utils/CatchErrorMessage';
@@ -45,10 +46,13 @@ const MarkerDetails: FC = () => {
     const route = useRoute<MarkerDetailsRouteProps>();
 
     const deviceId = useRef('');
-    const [deviceIdState,setDeviceIdState] = useState('');
+    const [deviceIdState, setDeviceIdState] = useState('');
     const [latitude, setLatitude] = useState(route.params.latitude.toFixed(5).toString());
     const [longitude, setLongitude] = useState(route.params.longitude.toFixed(5).toString());
     const [what3words, setWhat3Words] = useState<string>();
+
+    const [photoURIs, setPhotoURIs] = useState<string[]>([]);
+    const [imageViewVisible, setImageViewVisible] = useState(false);
 
     const [existingDeviceIDs, setExistingDeviceIDs] = useState<readonly string[]>([]);
     const [deviceIdError, setDeviceIdError] = useState<'must unique' | 'empty' | ''>('');
@@ -74,12 +78,17 @@ const MarkerDetails: FC = () => {
         const deviceIdError = await validateDeviceId()
 
         if (deviceIdError === '') {
+            const savedPhotoURIs = await Promise.all(photoURIs.map(async photoURI => {
+                return CameraRoll.save(photoURI, { type: 'photo', album: 'UmbrellaPeat' });
+            }))
+
             navigation.navigate('Home',
                 {
                     deviceId: deviceId.current!,
                     latitude: Number(latitude!),
                     longitude: Number(longitude!),
                     what3words: what3words!,
+                    savedPhotoURIs: savedPhotoURIs
                 })
         } else {
             setDeviceIdError(deviceIdError);
@@ -94,10 +103,6 @@ const MarkerDetails: FC = () => {
         }
         fetchWhat3Words()
             .catch(console.error);
-    }
-
-    function onClearDeviceId(){
-        setDeviceIdState("");
     }
 
     async function onDeviceIdChange(text: string) {
@@ -118,21 +123,19 @@ const MarkerDetails: FC = () => {
         }
     }
 
-
-
     return (
-        <View style={{ backgroundColor: theme.colors.onPrimary,...styles.wrapper }}>
+        <View style={{ backgroundColor: theme.colors.background, ...styles.wrapper }}>
 
             <View style={styles.header}>
-            <DeviceIDTextInput
+                <DeviceIDTextInput
                     onChangeText={onDeviceIdChange}
-                    onClearText={onClearDeviceId}
+                    onClearText={() => { setDeviceIdState("") }}
                     deviceId={deviceIdState}
                     errorType={deviceIdError}
                 />
 
             </View>
-            <View style={styles.mainContainer }>
+            <View style={styles.mainContainer}>
 
                 <View style={styles.cardContainer}>
 
@@ -143,9 +146,11 @@ const MarkerDetails: FC = () => {
                         onLatLngChange={onLatLngChange}
                     />
                 </View>
-                <View style={styles.cardContainer}>
-
-                    <MarkerImagesCard />
+                <View style={styles.cardContainer2}>
+                    <MarkerImagesCard 
+                    onPhotoURIsChange={(photoURIs: string[]) => { setPhotoURIs(photoURIs); }} 
+                    onImagePress={()=>{setImageViewVisible(true)}}
+                    />
                 </View>
 
 
@@ -178,6 +183,12 @@ const MarkerDetails: FC = () => {
                     </View>
                 </View>
             </View>
+            <ImageView
+                images={photoURIs.map(photoURI=>{return {uri:photoURI}})}
+                imageIndex={0}
+                visible={imageViewVisible}
+                onRequestClose={() => setImageViewVisible(false)}
+            />
         </View>
 
     );
@@ -192,23 +203,27 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         rowGap: 30,
-        paddingVertical:30,
+        paddingVertical: 30,
         paddingHorizontal: 25,
     },
     cardContainer: {
         flex: 1,
         maxHeight: '40%',
     },
+    cardContainer2: {
+        flex: 1,
+        maxHeight: '50%',
+    },
     header: {
         flex: 1,
         marginTop: 20,
-        paddingHorizontal: 25,  
+        paddingHorizontal: 25,
         justifyContent: 'flex-start',
     },
     footer: {
         flex: 1,
         marginBottom: 20,
-        paddingHorizontal: 25,  
+        paddingHorizontal: 25,
         justifyContent: 'flex-end',
     },
     fiftyPercentContainer: {
@@ -222,11 +237,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        maxWidth:'48%',
+        maxWidth: '48%',
     },
     button: {
         flex: 1,
-        maxHeight:50,
+        maxHeight: 50,
     },
     fontStyle: {
         fontSize: 22,
