@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         flex: 1,
-        maxHeight: '40%',
+        maxHeight: '35%',
     },
     cardContainer2: {
         flex: 1,
-        maxHeight: '50%',
+        maxHeight: '55%',
     },
     header: {
         flex: 1,
