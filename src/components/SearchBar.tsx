@@ -30,6 +30,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSubmitEditing }) => {
         return () => clearTimeout(timerRef.current);
     }, [])
 
+    useEffect(()=>{
+        if(searchBarVisible){
+            setSearchBarText('');
+            searchBarTextInputTimeout(20);
+        }
+    },[searchBarVisible])
+
     async function searchBarTextInputTimeout(timeoutInSeconds: number) {
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => { setSearchBarVisible(false); }, timeoutInSeconds * 1000)
@@ -62,14 +69,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSubmitEditing }) => {
     }
 
     function textInput() {
-        searchBarTextInputTimeout(10);
         return (
             <TextInput
                 mode='outlined'
                 theme={{ roundness: 25 }}
                 style={{ backgroundColor: theme.colors.secondaryContainer, ...styles.textInput }}
-                onChangeText={(text: string) => { searchBarTextInputTimeout(15); setSearchBarText(text); }}
-                onSubmitEditing={() => { searchBarTextInputTimeout(60); onSubmitEditing(searchBarText); }}
+                onChangeText={(text: string) => { searchBarTextInputTimeout(30); setSearchBarText(text); }}
+                onSubmitEditing={() => {searchBarTextInputTimeout(50);onSubmitEditing(searchBarText); }}
                 autoFocus={true}
                 autoComplete='username'
             />

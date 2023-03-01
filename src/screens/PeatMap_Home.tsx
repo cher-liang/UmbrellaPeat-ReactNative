@@ -247,7 +247,6 @@ const PeatMap_Home: FC = () => {
   }
 
   function onSearchBarSubmit(markerId: string) {
-    // console.log(markers);
     const searchResult=markers.filter((marker)=>{return (marker.title?.toLowerCase()==markerId.toLowerCase())});
     if (searchResult.length!=0){
       setAnimateCameraTo(
