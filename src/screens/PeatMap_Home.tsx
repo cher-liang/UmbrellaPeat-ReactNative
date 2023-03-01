@@ -19,6 +19,7 @@ import hasMessage from '../utils/CatchErrorMessage';
 import hasLocationPermission from '../utils/RequestLocationPermission';
 
 import type { HomeNavigationProps, HomeRouteProps } from '../types/screens';
+import SearchBar from '../components/SearchBar';
 
 const PeatMap_Home: FC = () => {
   const colorScheme = Appearance.getColorScheme();
@@ -245,6 +246,17 @@ const PeatMap_Home: FC = () => {
     setModalVisible(false);
   }
 
+  function onSearchBarSubmit(markerId: string) {
+    const searchResult=markers.filter((marker)=>{return (marker.title?.toLowerCase()==markerId.toLowerCase())});
+    if (searchResult.length!=0){
+      setAnimateCameraTo(
+        {
+          latitude: searchResult[0].coordinate.latitude,
+          longitude: searchResult[0].coordinate.longitude
+        } as LatLng);
+    }
+  }
+
   return (
     <View style={styles.mainContainer}>
 
@@ -262,6 +274,9 @@ const PeatMap_Home: FC = () => {
         animateCameraTo={animateCameraTo}
         onMarkerCalloutPress={onMarkerCalloutPress}
       />
+      <View style={styles.top}>
+        <SearchBar onSubmitEditing={onSearchBarSubmit} />
+      </View>
       <View style={styles.bottom}>
         <MyLocationButton
           onPressIn={animateCameraToCurrentPosition}
@@ -280,13 +295,20 @@ const styles = StyleSheet.create({
   mapView: {
     ...StyleSheet.absoluteFillObject,
   },
+  top: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 10,
+  },
   bottom: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
     position: 'absolute',
     bottom: 0,
-    right: 15
+    right: 15,
   },
 });
 

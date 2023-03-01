@@ -38,7 +38,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
     const [_latitude, setLatitude] = useState<string>(latitude);
     const [_longitude, setLongitude] = useState<string>(longitude);
 
-    useMemo(() => {
+    useEffect(() => {
         if (!readonly) {
             onLatLngChange!(_latitude, _longitude);
         }
@@ -82,6 +82,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
                             mode='outlined'
                             label='Latitude'
                             value={getLatitude()}
+                            keyboardType='numeric'
                             style={{ backgroundColor: theme.colors.onSecondary, ...styles.textInput }}
                             theme={{ roundness: 10 }}
                             onChangeText={setLatitude}
@@ -91,8 +92,9 @@ const LocationCard: React.FC<LocationCardProps> = ({ latitude, longitude, what3w
                     <View style={styles.latlng}>
                         <TextInput
                             mode='outlined'
-                            label='Longtiude'
+                            label='Longitude'
                             value={getLongitude()}
+                            keyboardType='numeric'
                             style={{ backgroundColor: theme.colors.onSecondary, ...styles.textInput }}
                             theme={{ roundness: 10 }}
                             onChangeText={setLongitude}

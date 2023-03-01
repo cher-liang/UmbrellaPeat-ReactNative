@@ -13,8 +13,9 @@ import {
     Text,
     useTheme
 } from 'react-native-paper';
-import ImageView from "react-native-image-viewing";
 
+import ImageView from "react-native-image-viewing";
+// import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 import hasMessage from '../utils/CatchErrorMessage';
 
@@ -78,6 +79,9 @@ const MarkerCalloutModal: React.FC<MarkerCalloutModalProps> = ({ visible, onDism
 
     function onDeleteButtonPressed() {
         onMarkerDelete(deviceId);
+
+        // // camera-roll library deletion error, could not handle promise
+        // CameraRoll.deletePhotos(photoURIs);
     }
 
     return (
@@ -140,12 +144,12 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         flex: 7,
-        maxHeight: '60%',
+        maxHeight: '70%',
         paddingHorizontal: 10,
     },
     cardContainer2: {
         flex: 3,
-        maxHeight: '40%',
+        maxHeight: '30%',
         paddingHorizontal: 10,
     },
 });
