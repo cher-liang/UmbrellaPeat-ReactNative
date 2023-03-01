@@ -68,7 +68,7 @@ const PeatMapView = ({
         {!!markers && (
           markers.map((marker, index) =>
             <Marker
-              key={marker.title}
+              key={`marker_${index}`}
               coordinate={marker.coordinate}
               title={marker.title}
               description={marker.description}
