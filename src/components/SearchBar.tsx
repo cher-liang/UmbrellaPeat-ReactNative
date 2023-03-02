@@ -3,7 +3,6 @@ import {
     View,
     StyleSheet,
     Keyboard,
-    Animated,
     TouchableOpacity
 } from "react-native"
 
@@ -13,6 +12,8 @@ import {
     useTheme
 } from 'react-native-paper';
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
+
+import Animated,{ StretchInX, StretchInY, StretchOutX, StretchOutY } from 'react-native-reanimated';
 
 
 interface SearchBarProps {
@@ -44,7 +45,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSubmitEditing }) => {
 
     function logoAndButton() {
         return (
-            <View>
+            <Animated.View entering={StretchInX}>
                 <TouchableOpacity
                     onPress={() => {
                         setSearchBarVisible(true);
@@ -64,21 +65,23 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSubmitEditing }) => {
 
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         );
     }
 
     function textInput() {
         return (
-            <TextInput
-                mode='outlined'
-                theme={{ roundness: 25 }}
-                style={{ backgroundColor: theme.colors.secondaryContainer, ...styles.textInput }}
-                onChangeText={(text: string) => { searchBarTextInputTimeout(30); setSearchBarText(text); }}
-                onSubmitEditing={() => {searchBarTextInputTimeout(50);onSubmitEditing(searchBarText); }}
-                autoFocus={true}
-                autoComplete='username'
-            />
+            <Animated.View entering={StretchInX}>
+                <TextInput
+                    mode='outlined'
+                    theme={{ roundness: 25 }}
+                    style={{ backgroundColor: theme.colors.secondaryContainer, ...styles.textInput }}
+                    onChangeText={(text: string) => { searchBarTextInputTimeout(30); setSearchBarText(text); }}
+                    onSubmitEditing={() => {searchBarTextInputTimeout(50);onSubmitEditing(searchBarText); }}
+                    autoFocus={true}
+                    autoComplete='username'
+                />
+            </Animated.View>
         );
     }
 
@@ -104,13 +107,14 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         borderWidth: 1,
         height: 50,
-        marginTop: 5
+        marginTop: 5,
+        marginHorizontal:30
     },
     logoContainer: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     logoText: {
         fontSize: 25,
